@@ -1,0 +1,49 @@
+﻿@using BurAuthLib.Resources.Enums
+
+<div>
+    @if (CurrentAction == AuthenticationAction.LogInCallback)
+    {
+        @LoginCallback
+    }
+    else if (CurrentAction == AuthenticationAction.LoggingIn)
+    {
+        @LoggingIn
+    }
+    else if (CurrentAction == AuthenticationAction.LogOut)
+    {
+        @LogOut
+    }
+    else if (CurrentAction == AuthenticationAction.LogOutCallback)
+    {
+        @LogOutCallback
+    }
+    else if (CurrentAction == AuthenticationAction.LogInFailed)
+    {
+        @LogInFailed
+    }
+    else if (CurrentAction == AuthenticationAction.LogOutFailed)
+    {
+        @LogOutFailed
+    }
+    else if (CurrentAction == AuthenticationAction.LogInSucceeded)
+    {
+        OnLogInSucceeded.InvokeAsync();
+    }
+    else if (CurrentAction == AuthenticationAction.LogOutSucceeded)
+    {
+        OnLogOutSucceeded.InvokeAsync();
+    }
+</div>
+
+@code {
+    [Parameter] public AuthenticationAction CurrentAction { get; set; }
+    [Parameter] public EventCallback OnLogInSucceeded { get; set; }
+    [Parameter] public EventCallback OnLogOutSucceeded { get; set; }
+    [Parameter] public RenderFragment ChildContent { get; set; }
+    [Parameter] public RenderFragment LoginCallback { get; set; }
+    [Parameter] public RenderFragment LoggingIn { get; set; }
+    [Parameter] public RenderFragment LogOut { get; set; }
+    [Parameter] public RenderFragment LogOutCallback { get; set; }
+    [Parameter] public RenderFragment LogInFailed { get; set; }
+    [Parameter] public RenderFragment LogOutFailed { get; set; }
+}

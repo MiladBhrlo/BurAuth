@@ -1,0 +1,11 @@
+﻿@using BurAuthLib.Services
+@inject TranslationService TranslationService
+
+@code {
+    [Parameter]
+    public string Text { get; set; }
+}
+
+<div>
+    <p>@TranslationService.GetTranslation(Text)</p>
+</div>

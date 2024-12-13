@@ -1,0 +1,45 @@
+﻿@using BurAuth.Components
+@using BurAuthLib.Resources.Enums
+@using BurAuthLib.Services
+@using Microsoft.AspNetCore.Components.Authorization
+@inject BurAuthProvider AuthProvider
+@inject BurAuthTokenProvider TokenProvider
+@inject NavigationManager Navigation
+
+
+<Router AppAssembly="@typeof(Program).Assembly">
+    <Found Context="routeData">
+        <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(MainLayout)" >
+            <NotAuthorized> 
+                @if (_authState == AuthState.NotAuthenticated) {
+                    <RedirectToAuthentication /> 
+                } 
+                else { 
+                    <p>Access denied.</p> 
+                } 
+                </NotAuthorized>
+            </AuthorizeRouteView>
+        <FocusOnNavigate RouteData="routeData" Selector="h1" />
+    </Found>
+    <NotFound>
+        <PageTitle>Not found</PageTitle>
+        <LayoutView Layout="@typeof(MainLayout)">
+            <p role="alert">Sorry, there's nothing at this address.</p>
+        </LayoutView>
+    </NotFound>
+</Router>
+
+@code {
+    private AuthState _authState = AuthState.NotAuthenticated;
+    protected override async Task OnInitializedAsync()
+    {
+        _authState = await AuthProvider.IsUserAuthenticatedAsync() ? AuthState.Authenticated : AuthState.NotAuthenticated;
+        // بررسی وضعیت احراز هویت کاربر
+        var isAuthenticated = await AuthProvider.IsUserAuthenticatedAsync();
+        if (isAuthenticated)
+        {
+            // کاربر احراز هویت شده است
+            StateHasChanged();
+        }
+    }
+}

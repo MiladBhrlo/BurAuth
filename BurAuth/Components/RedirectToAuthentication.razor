@@ -1,0 +1,13 @@
+﻿@using BurAuthLib.Resources.Enums
+@inject NavigationManager Navigation
+
+@code {
+    protected override void OnInitialized()
+    {
+        Navigation.NavigateTo($"/authentication/{AuthenticationAction.LoggingIn.ToString()}");
+    }
+}
+
+<div>
+    <p>در حال هدایت به صفحه احراز هویت...</p>
+</div>

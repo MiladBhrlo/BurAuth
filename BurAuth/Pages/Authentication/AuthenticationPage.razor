@@ -1,0 +1,164 @@
+﻿@page "/authentication/{Action}"
+@using BurAuth.Components
+@using BurAuthLib.Resources.Enums
+@using BurAuthLib.Services
+@using Microsoft.AspNetCore.Authorization
+@inject NavigationManager NavigationManager
+@inject BurAuthProvider AuthProvider
+@inject BurAuthTokenProvider TokenProvider
+
+@layout NotAuthorizedMainLayout
+@attribute [AllowAnonymous]
+
+<RemoteAuthenticatorView CurrentAction="_action" OnLogInSucceeded="OnLogInSucceeded" OnLogOutSucceeded="OnLogOutSucceeded">
+    <LoggingIn>
+        <Body>
+            <AuthTextView Text="LOGGING_IN_TEXT" />
+        </Body>
+    </LoggingIn>
+
+    <LoginCallback>
+        <Body>
+            <AuthTextView Text="LOGGING_IN_CALLBACK_TEXT" />
+        </Body>
+    </LoginCallback>
+    <LogOutCallback>
+        <Body>
+            <AuthTextView Text="LOGGING_IN_CALLBACK_TEXT" />
+        </Body>
+    </LogOutCallback>
+    <LogInFailed>
+        <Body>
+            <AuthTextView Text="LOG_IN_FAILED_TEXT" />
+            <button @onclick="ReturnToHome">بازگشت به خانه</button>
+        </Body>
+    </LogInFailed>
+@* 
+    <CompletingLoggingIn>
+        <Body>
+            <AuthTextView Text="COMPLETING_LOGGING_IN_TEXT" />
+        </Body>
+    </CompletingLoggingIn> *@
+
+    <LogOut>
+        <Body>
+            <AuthTextView Text="LOG_OUT_TEXT" />
+        </Body>
+    </LogOut>
+
+    <LogOutFailed>
+        <Body>
+            <AuthTextView Text="LOG_OUT_FAILED_TEXT" />
+            <button @onclick="ReturnToHome">بازگشت به خانه</button>
+        </Body>
+    </LogOutFailed>
+
+@*     <LogOutSucceeded>
+        <Body>
+            <AuthTextView Text="LOG_OUT_SUCCEEDED_TEXT" />
+            <button @onclick="ReturnToHome">بازگشت به خانه</button>
+        </Body>
+    </LogOutSucceeded>
+    <LogInSucceeded>
+        <Body>
+            <AuthTextView Text="LOG_IN_SUCCEEDED_TEXT" />
+            <button @onclick="ReturnToHome">بازگشت به خانه</button>
+        </Body>
+    </LogInSucceeded> *@
+@* 
+    <CompletingLogOut>
+        <Body>
+            <AuthTextView Text="COMPLETING_LOG_OUT_TEXT" />
+            <button @onclick="ReturnToHome">بازگشت به خانه</button>
+        </Body>
+    </CompletingLogOut>
+
+    <Registering>
+        <Body>
+            <div class="card loading w-100 h-100"></div>
+            <button @onclick="ReturnToHome">بازگشت به خانه</button>
+        </Body>
+    </Registering>
+
+    <UserProfile>
+        <Body>
+            <div class="card loading w-100 h-100"></div>
+            <button @onclick="ReturnToHome">بازگشت به خانه</button>
+        </Body>
+    </UserProfile> *@
+</RemoteAuthenticatorView>
+
+ @code {
+    private AuthenticationAction _action;
+    [Parameter] public string Action { get; set; }
+    [Parameter] public string Code { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        if (!Enum.TryParse<AuthenticationAction>(Action, true, out _action))
+        {
+            // Handle invalid action
+            _action = AuthenticationAction.LoggingIn; // یا هر مقدار پیش‌فرض دیگر
+        }
+        if (_action == AuthenticationAction.LoggingIn)
+        {
+            PerformLogin();
+        }
+        else if (_action == AuthenticationAction.LogOut)
+        {
+            PerformLogout();
+        }
+        else if (_action == AuthenticationAction.LogInCallback)
+        {
+            HandleLoginCallback();
+        }
+        else if (_action == AuthenticationAction.LogOutCallback)
+        {
+            HandleLogoutCallback();
+        }
+    }
+
+    private async Task PerformLogin()
+    {
+        var clientId = "7853bkb4494d7ca6f5516309e77baf";
+        var redirectUri = "your-redirect-uri";
+        var authCode = await AuthProvider.GetAuthorizationCodeAsync(clientId, redirectUri);
+        NavigationManager.NavigateTo($"/authentication/{AuthenticationAction.LoggingIn}?code={authCode}");
+    }
+
+    private async Task HandleLoginCallback()
+    {
+        var clientId = "7853bkb4494d7ca6f5516309e77baf";
+        var clientSecret = "your-client-secret";
+        var redirectUri = "your-redirect-uri";
+        var tokenResponse = await TokenProvider.GetAccessTokenAsync(clientId, clientSecret, Code, redirectUri, "code-verifier");
+        // ذخیره توکن‌ها و مدیریت وضعیت احراز هویت
+    }
+
+    private async Task PerformLogout()
+    {
+        // لاگیک برای لاگ‌اوت کاربر NavigationManager.NavigateTo("/");
+    }
+
+    private async Task HandleLogoutCallback()
+    {
+        // منطق برای لاگ‌اوت کاربر و پاک کردن توکن‌ها NavigationManager.NavigateTo("/");
+    }
+
+    private async Task OnLogInSucceeded()
+    {
+        // منطق برای پس از موفقیت در ورود به سیستم
+        await Task.CompletedTask;
+    }
+
+    private async Task OnLogOutSucceeded()
+    {
+        // منطق برای پس از موفقیت در خروج از سیستم
+        await Task.CompletedTask;
+    }
+
+    private void ReturnToHome()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+}
